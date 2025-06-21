@@ -1,0 +1,43 @@
+User-agent: *
+Allow: /
+
+# Bloquer les pages techniques
+Disallow: /404.html
+Disallow: /offline.html
+
+# Bloquer les assets
+Disallow: /css/
+Disallow: /js/
+Disallow: /fonts/
+
+# Sitemaps
+Sitemap: https://recettes-blog-test.pages.dev/sitemap.xml
+
+# Crawl delay pour les bots agressifs
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10
+
+User-agent: DotBot
+Crawl-delay: 10
+
+User-agent: MJ12bot
+Disallow: /
+
+# Bot malveillants
+User-agent: SiteSnagger
+Disallow: /
+
+User-agent: WebStripper
+Disallow: /
+
+User-agent: WebCopier
+Disallow: /
+
+User-agent: Offline Explorer
+Disallow: /
+
+User-agent: HTTrack
+Disallow: /

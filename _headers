@@ -1,0 +1,11 @@
+/*
+
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://plausible.io https://cdn.jsdelivr.net https://cdn.tailwindcss.com ; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://plausible.io; connect-src 'self' https://plausible.io https://blog-config-api.kasri-elmehdi.workers.dev; font-src 'self'; frame-ancestors 'none';
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Cross-Origin-Opener-Policy: same-origin
+  X-Frame-Options: DENY
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+
+*/
