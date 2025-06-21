@@ -1,5 +1,5 @@
 site:
-  name: Test
+  name: "testclonesiteoneclic"
   language: fr
   tagline: Chef & Créatrice
   description: Recettes maison faciles et gourmandes
@@ -7,8 +7,8 @@ site:
   email: contact@recettes-blog.com
 branding:
   logo_text: "T" 
-  hero_title_line1: Plongez dans
-  hero_title_line2: l'Art de la Cuisine
+  hero_title_line1: "jeteste"
+  hero_title_line2: "testclonesiteoneclic"
   hero_subtitle: Chaque jour, une création gourmande pensée pour enchanter vos papilles et sublimer votre quotidien.
 colors:
   primary: "#ea580c"
