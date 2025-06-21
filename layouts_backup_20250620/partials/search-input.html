@@ -1,0 +1,34 @@
+<!-- layouts/partials/search-input.html -->
+<div class="relative w-full overflow-visible">
+<label for="search-{{ .TargetID }}" class="sr-only">
+ {{ .Placeholder }}
+</label>
+<input
+id="search-{{ .TargetID }}"
+name="search-{{ .TargetID }}"
+data-target-id="{{ .TargetID }}"
+type="search"
+enterkeyhint="search"
+placeholder="{{ .Placeholder }}"
+role="combobox"
+aria-autocomplete="list"
+aria-expanded="false"
+aria-controls="search-results-{{ .TargetID }}"
+aria-haspopup="listbox"
+aria-label="{{ .Placeholder }}"
+class="{{ .Class }}"
+/>
+<button
+id="search-clear-{{ .TargetID }}"
+type="button"
+class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden"
+aria-label="Effacer la recherche"
+>×</button>
+<ul
+id="search-results-{{ .TargetID }}"
+role="listbox"
+aria-label="Suggestions de recherche"
+class="absolute left-0 top-full mt-2 w-full bg-white/95 backdrop-blur-sm border border-gray-200 rounded-lg shadow-xl max-h-64 overflow-auto hidden divide-y divide-gray-100"
+style="z-index: 10001;"
+></ul>
+</div>

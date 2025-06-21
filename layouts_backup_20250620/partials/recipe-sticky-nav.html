@@ -1,0 +1,40 @@
+<!-- layouts/partials/recipe-sticky-nav.html - VERSION CENTRALISÉE -->
+
+{{ $config := .Site.Data.config }}
+{{ $sticky_nav := $config.components.sticky_nav }}
+
+<nav id="stickyNav"
+     class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50
+            bg-white/90 backdrop-blur-md shadow-md
+            rounded-full px-6 py-2 flex gap-6 text-xs font-medium select-none">
+
+  <a href="#ingredients" data-target="ingredients" class="navLink flex items-center gap-1">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+    {{ $sticky_nav.ingredients }}
+  </a>
+
+  <a href="#steps" data-target="steps" class="navLink flex items-center gap-1">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M6 9l6 6 6-6"/>
+    </svg>
+    {{ $sticky_nav.steps }}
+  </a>
+
+  {{ with .Params.faq }}
+  <a href="#faq" data-target="faq" class="navLink flex items-center gap-1">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M12 18h.01M12 14a4 4 0 1 0-4-4"/>
+    </svg>
+    {{ $sticky_nav.faq }}
+  </a>
+  {{ end }}
+
+  <button type="button" id="navSaveBtn" data-target="save" class="navLink flex items-center gap-1">
+    <svg id="navSaveIcon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M12 17.27L18.18 21l-1.63-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.45 4.73L5.82 21z"/>
+    </svg>
+    {{ $sticky_nav.save }}
+  </button>
+</nav>

@@ -1,0 +1,231 @@
+{{ define "main" }}
+
+{{ $config := .Site.Data.config }}
+{{ $homepage := $config.homepage }}
+
+<!-- Hero animé (conservé tel quel car spécifique) -->
+{{ partial "hero.html" . }}
+
+<!-- À propos de la cheffe (conservé tel quel car design unique) -->
+{{ partial "about-chef.html" . }}
+
+<!-- SECTION MIGRÉE : Dernières recettes -->
+<section class="section">
+  <div class="container">
+    
+    <!-- 🏷️ Titre avec classe section__title -->
+    <h2 class="section__title">
+      {{ $homepage.latest_recipes.title }}
+    </h2>
+    
+    <!-- Description -->
+    <p class="text-base text-center mb-8 max-w-2xl mx-auto" style="color: var(--color-text-secondary);">
+      {{ $homepage.latest_recipes.description }}
+    </p>
+
+    <!-- Barre de filtres avec BOUTONS MIGRÉS -->
+    <div id="filters" class="flex flex-wrap gap-4 mb-8 items-center justify-center">
+      <div class="flex flex-col">
+        <label for="filter-category" class="text-sm font-medium mb-1" style="color: var(--color-text);">{{ $homepage.filters.category_label }}</label>
+        <select id="filter-category" name="filter-category" class="px-3 py-2 border rounded-lg" style="border-color: var(--color-text-secondary); color: var(--color-text);">
+          <option value="">{{ $homepage.filters.category_all }}</option>
+          {{ range $name, $pages := .Site.Taxonomies.categories }}
+            <option value="{{ $name }}">{{ $name }} ({{ len $pages }})</option>
+          {{ end }}
+        </select>
+      </div>
+
+      <div class="flex flex-col">
+        <label for="filter-tag" class="text-sm font-medium mb-1" style="color: var(--color-text);">{{ $homepage.filters.tag_label }}</label>
+        <select id="filter-tag" name="filter-tag" class="px-3 py-2 border rounded-lg" style="border-color: var(--color-text-secondary); color: var(--color-text);">
+          <option value="">{{ $homepage.filters.tag_all }}</option>
+          {{ range $name, $pages := .Site.Taxonomies.tags }}
+            <option value="{{ $name }}">{{ $name }} ({{ len $pages }})</option>
+          {{ end }}
+        </select>
+      </div>
+
+      <div class="flex flex-col">
+        <label for="filter-time" class="text-sm font-medium mb-1" style="color: var(--color-text);">{{ $homepage.filters.time_label }}</label>
+        <input id="filter-time" type="number" min="0" placeholder="{{ $homepage.filters.time_placeholder }}" class="w-28 px-3 py-2 border rounded-lg" style="border-color: var(--color-text-secondary); color: var(--color-text);">
+      </div>
+
+      <!-- BOUTON RESET MIGRÉ -->
+      <button id="filter-reset" class="btn btn--secondary mt-5">
+        {{ $homepage.filters.reset_button }}
+      </button>
+    </div>
+
+    <!-- Grille recettes avec CARDS MIGRÉES -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {{ range first 6 (where .Site.RegularPages "Section" "recipes") }}
+        <a href="{{ .RelPermalink }}" class="card block transform transition hover:-translate-y-1">
+          {{ with .Params.image }}
+            {{ $img := resources.Get (printf "images/%s" .) }}
+            {{ if $img }}
+              {{ $small := $img.Fill "400x240 q85" }}
+              {{ $medium := $img.Fill "600x360 q85" }}
+              {{ $webpSmall := $img.Fill "400x240 q80 webp" }}
+              {{ $webpMedium := $img.Fill "600x360 q80 webp" }}
+              
+              <picture>
+                <source srcset="{{ $webpSmall.RelPermalink }} 400w, {{ $webpMedium.RelPermalink }} 600w" 
+                        type="image/webp"
+                        sizes="(max-width: 768px) 400px, 600px">
+                <source srcset="{{ $small.RelPermalink }} 400w, {{ $medium.RelPermalink }} 600w" 
+                        type="image/jpeg"
+                        sizes="(max-width: 768px) 400px, 600px">
+                <img src="{{ $small.RelPermalink }}" 
+                     alt="Image de la recette {{ $.Title }}" 
+                     class="w-full h-48 object-cover rounded-t-xl" 
+                     loading="lazy"
+                     width="400" 
+                     height="240">
+              </picture>
+            {{ else }}
+              <div class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-xl">
+                <span class="text-gray-400 text-sm">Image non trouvée</span>
+              </div>
+            {{ end }}
+          {{ end }}
+          
+          <div class="p-4">
+            <h3 class="text-lg font-semibold mb-2" style="color: var(--color-text); font-family: var(--font-serif);">
+              {{ .Title }}
+            </h3>
+            {{ with .Params.description }}
+              <p class="text-sm line-clamp-3" style="color: var(--color-text-secondary);">
+                {{ . }}
+              </p>
+            {{ end }}
+            <span class="text-xs mt-2 block" style="color: var(--color-text-muted);">
+              {{ .Date.Format "02 Jan 2006" }}
+            </span>
+          </div>
+        </a>
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+<!-- SECTION MIGRÉE : Recettes populaires -->
+<section class="section">
+  <div class="container">
+    
+    <!-- 🏷️ Titre avec classe section__title -->
+    <h2 class="section__title">
+      {{ $homepage.popular_recipes.title }}
+    </h2>
+    
+    <!-- Grille recettes avec CARDS MIGRÉES -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {{ $all := where .Site.RegularPages "Section" "recipes" }}
+      {{ $count := len $all }}
+      {{ if gt $count 0 }}
+        {{ $week := div now.Unix 604800 }}
+        {{ $offset := mod $week $count }}
+        {{ $limit := 6 }}
+        {{ if lt $count 6 }}{{ $limit = $count }}{{ end }}
+
+        {{ range $i := seq 0 (sub $limit 1) }}
+          {{ $idx := mod (add $offset $i) $count }}
+          {{ $item := index $all $idx }}
+          <a href="{{ $item.RelPermalink }}" class="card block transform transition hover:-translate-y-1">
+            {{ with $item.Params.image }}
+              {{ $img := resources.Get (printf "images/%s" .) }}
+              {{ if $img }}
+                {{ $small := $img.Fill "400x240 q85" }}
+                {{ $medium := $img.Fill "600x360 q85" }}
+                {{ $webpSmall := $img.Fill "400x240 q80 webp" }}
+                {{ $webpMedium := $img.Fill "600x360 q80 webp" }}
+                
+                <picture>
+                  <source srcset="{{ $webpSmall.RelPermalink }} 400w, {{ $webpMedium.RelPermalink }} 600w" 
+                          type="image/webp"
+                          sizes="(max-width: 768px) 400px, 600px">
+                  <source srcset="{{ $small.RelPermalink }} 400w, {{ $medium.RelPermalink }} 600w" 
+                          type="image/jpeg"
+                          sizes="(max-width: 768px) 400px, 600px">
+                  <img src="{{ $small.RelPermalink }}" 
+                       alt="Image de la recette {{ $item.Title }}" 
+                       class="w-full h-48 object-cover rounded-t-xl" 
+                       loading="lazy"
+                       width="400" 
+                       height="240">
+                </picture>
+              {{ else }}
+                <div class="w-full h-48 bg-gray-200 flex items-center justify-center rounded-t-xl">
+                  <span class="text-gray-400 text-sm">Image non trouvée</span>
+                </div>
+              {{ end }}
+            {{ end }}
+            
+            <div class="p-4">
+              <h3 class="text-lg font-semibold mb-2" style="color: var(--color-text); font-family: var(--font-serif);">
+                {{ $item.Title }}
+              </h3>
+              {{ with $item.Params.description }}
+                <p class="text-sm line-clamp-3" style="color: var(--color-text-secondary);">
+                  {{ . }}
+                </p>
+              {{ end }}
+            </div>
+          </a>
+        {{ end }}
+      {{ else }}
+        <p class="text-center col-span-full" style="color: var(--color-text-secondary);">
+          {{ $homepage.popular_recipes.empty_message }}
+        </p>
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+<!-- SECTION MIGRÉE : Explorer par catégorie -->
+<section class="section">
+  <div class="container">
+    
+    <!-- 🏷️ Titre avec classe section__title -->
+    <h2 class="section__title">
+      {{ $homepage.categories_section.title }}
+    </h2>
+    
+    <!-- Grille catégories avec CARDS MIGRÉES -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6 justify-center">
+      {{ range sort .Site.Taxonomies.categories "Count" "desc" }}
+        {{ $term := .Page.Title }}
+        <a href="{{ .Page.RelPermalink }}" class="card--compact card flex items-center justify-center text-center text-base font-semibold min-h-[96px] hover:scale-105 transform transition duration-300" style="color: var(--color-text); font-family: var(--font-serif);">
+          {{ $term }}
+        </a>
+      {{ end }}
+    </div>
+  </div>
+</section>
+
+<!-- SECTION MIGRÉE : Newsletter -->
+<section class="section">
+  <div class="container">
+    
+    <!-- 🏷️ Titre avec classe section__title -->
+    <h2 class="section__title">
+      {{ $homepage.newsletter.title }}
+    </h2>
+    
+    <!-- Description -->
+    <p class="text-center max-w-xl mx-auto mb-8 text-base" style="color: var(--color-text-secondary);">
+      {{ $homepage.newsletter.description }}
+    </p>
+    
+    <!-- Formulaire newsletter avec BOUTON MIGRÉ -->
+    <form action="{{ $homepage.newsletter.form_action }}" method="POST" class="max-w-lg mx-auto flex flex-col sm:flex-row sm:items-center gap-4">
+      <label for="newsletter-email" class="sr-only">Adresse email</label>
+      <input id="newsletter-email" type="email" name="email" required placeholder="{{ $homepage.newsletter.email_placeholder }}" class="w-full sm:flex-grow px-4 py-3 border rounded-lg focus:outline-none focus:ring-2" style="border-color: var(--color-text-muted); color: var(--color-text);">
+      <!-- BOUTON NEWSLETTER MIGRÉ -->
+      <button type="submit" class="btn btn--primary btn--lg">
+        {{ $homepage.newsletter.button_text }}
+      </button>
+    </form>
+  </div>
+</section>
+
+{{ end }}

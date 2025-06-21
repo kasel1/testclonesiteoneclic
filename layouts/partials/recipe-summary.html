@@ -1,0 +1,154 @@
+{{/* Parsing sécurisé et CORRIGÉ des durées ISO 8601 - VERSION CENTRALISÉE */}}
+
+{{ $config := .Site.Data.config }}
+{{ $recipe_page := $config.recipe_page }}
+{{ $summary_labels := $recipe_page.summary_labels }}
+
+{{- $prepMin := 0 -}}
+{{- $cookMin := 0 -}}
+
+{{/* Parsing du temps de préparation - VERSION CORRIGÉE */}}
+{{- if and .Params.prepTime (ne .Params.prepTime "") -}}
+  {{- $duration := .Params.prepTime -}}
+  
+  {{/* 1. HEURES + MINUTES OBLIGATOIRES (PT1H30M) */}}
+  {{- if findRE "^PT\\d+H\\d+M$" $duration -}}
+    {{- $hours := int (replaceRE "^PT(\\d+)H\\d+M$" "$1" $duration) -}}
+    {{- $mins := int (replaceRE "^PT\\d+H(\\d+)M$" "$1" $duration) -}}
+    {{- $prepMin = add (mul $hours 60) $mins -}}
+    
+  {{/* 2. HEURES SEULEMENT (PT2H) */}}
+  {{- else if findRE "^PT\\d+H$" $duration -}}
+    {{- $hours := int (replaceRE "^PT(\\d+)H$" "$1" $duration) -}}
+    {{- $prepMin = mul $hours 60 -}}
+    
+  {{/* 3. MINUTES SEULEMENT (PT15M ou PT90M) */}}
+  {{- else if findRE "^PT\\d+M$" $duration -}}
+    {{- $prepMin = int (replaceRE "^PT(\\d+)M$" "$1" $duration) -}}
+  {{- end -}}
+{{- end -}}
+
+{{/* Parsing du temps de cuisson - VERSION CORRIGÉE */}}
+{{- if and .Params.cookTime (ne .Params.cookTime "") -}}
+  {{- $duration := .Params.cookTime -}}
+  
+  {{/* 1. HEURES + MINUTES OBLIGATOIRES (PT1H30M) */}}
+  {{- if findRE "^PT\\d+H\\d+M$" $duration -}}
+    {{- $hours := int (replaceRE "^PT(\\d+)H\\d+M$" "$1" $duration) -}}
+    {{- $mins := int (replaceRE "^PT\\d+H(\\d+)M$" "$1" $duration) -}}
+    {{- $cookMin = add (mul $hours 60) $mins -}}
+    
+  {{/* 2. HEURES SEULEMENT (PT2H) */}}
+  {{- else if findRE "^PT\\d+H$" $duration -}}
+    {{- $hours := int (replaceRE "^PT(\\d+)H$" "$1" $duration) -}}
+    {{- $cookMin = mul $hours 60 -}}
+    
+  {{/* 3. MINUTES SEULEMENT (PT15M ou PT90M) */}}
+  {{- else if findRE "^PT\\d+M$" $duration -}}
+    {{- $cookMin = int (replaceRE "^PT(\\d+)M$" "$1" $duration) -}}
+  {{- end -}}
+{{- end -}}
+
+{{/* Formatage des durées - VERSION CORRIGÉE */}}
+{{- $prep := "0 min" -}}
+{{- if ge $prepMin 60 -}}
+  {{- $hours := div $prepMin 60 -}}
+  {{- $remainingMins := mod $prepMin 60 -}}
+  {{- if eq $remainingMins 0 -}}
+    {{- $prep = printf "%dh" $hours -}}
+  {{- else -}}
+    {{- $prep = printf "%dh %02d" $hours $remainingMins -}}
+  {{- end -}}
+{{- else if gt $prepMin 0 -}}
+  {{- $prep = printf "%d min" $prepMin -}}
+{{- end -}}
+
+{{- $cook := "0 min" -}}
+{{- if ge $cookMin 60 -}}
+  {{- $hours := div $cookMin 60 -}}
+  {{- $remainingMins := mod $cookMin 60 -}}
+  {{- if eq $remainingMins 0 -}}
+    {{- $cook = printf "%dh" $hours -}}
+  {{- else -}}
+    {{- $cook = printf "%dh %02d" $hours $remainingMins -}}
+  {{- end -}}
+{{- else if gt $cookMin 0 -}}
+  {{- $cook = printf "%d min" $cookMin -}}
+{{- end -}}
+
+{{- $totalMin := add $prepMin $cookMin -}}
+{{- $total := "0 min" -}}
+{{- if ge $totalMin 60 -}}
+  {{- $hours := div $totalMin 60 -}}
+  {{- $remainingMins := mod $totalMin 60 -}}
+  {{- if eq $remainingMins 0 -}}
+    {{- $total = printf "%dh" $hours -}}
+  {{- else -}}
+    {{- $total = printf "%dh %02d" $hours $remainingMins -}}
+  {{- end -}}
+{{- else if gt $totalMin 0 -}}
+  {{- $total = printf "%d min" $totalMin -}}
+{{- end -}}
+
+{{/* Gestion des portions avec valeur par défaut */}}
+{{- $servings := .Params.recipeYield | default "N/A" -}}
+
+<div class="grid grid-cols-2 sm:grid-cols-4 text-center divide-x divide-gray-200
+            bg-gray-50 rounded-lg shadow-sm p-4 border border-gray-100">
+  <!-- Prep -->
+  <div class="flex flex-col items-center gap-2 px-2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-copper" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <span class="text-xs font-medium uppercase text-gray-600 tracking-wide">{{ $summary_labels.prep }}</span>
+    <span class="text-sm font-bold text-charcoal">{{ $prep }}</span>
+  </div>
+
+  <!-- Cook -->
+  <div class="flex flex-col items-center gap-2 px-2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-copper-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 18.657A8 8 0 716.343 7.343S7 9 9 10c0-2 1-4 4-4s4 2 4 4c2-1 2.657-2.657 2.657-2.657z" />
+      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-3 8v-8" />
+    </svg>
+    <span class="text-xs font-medium uppercase text-gray-600 tracking-wide">{{ $summary_labels.cook }}</span>
+    <span class="text-sm font-bold text-charcoal">{{ $cook }}</span>
+  </div>
+
+  <!-- Total -->
+  <div class="flex flex-col items-center gap-2 px-2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-copper-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6-2a10 10 0 11-20 0 10 10 0 0120 0z" />
+    </svg>
+    <span class="text-xs font-medium uppercase text-gray-600 tracking-wide">{{ $summary_labels.total }}</span>
+    <span class="text-sm font-bold text-charcoal">{{ $total }}</span>
+  </div>
+
+  <!-- Servings -->
+  <div class="flex flex-col items-center gap-2 px-2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-charcoal-light" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+    </svg>
+    <span class="text-xs font-medium uppercase text-gray-600 tracking-wide">{{ $summary_labels.servings }}</span>
+    <span class="text-sm font-bold text-charcoal">{{ $servings }}</span>
+  </div>
+</div>
+
+{{/* Debug info en développement */}}
+{{- if not hugo.IsProduction -}}
+  {{- if or .Params.prepTime .Params.cookTime -}}
+    <div class="mt-2 text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-200">
+      <strong>Debug:</strong> 
+      prepTime={{ .Params.prepTime }} ({{ $prepMin }}min) | 
+      cookTime={{ .Params.cookTime }} ({{ $cookMin }}min)
+    </div>
+  {{- end -}}
+{{- end -}}
+
+{{/* Message si données manquantes */}}
+{{- if and (eq $prepMin 0) (eq $cookMin 0) -}}
+  {{- if or (not .Params.prepTime) (not .Params.cookTime) -}}
+    <div class="mt-2 text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded border border-amber-200">
+      <strong>Note :</strong> Certaines informations de timing sont manquantes.
+    </div>
+  {{- end -}}
+{{- end -}}

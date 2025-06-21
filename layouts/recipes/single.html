@@ -1,0 +1,228 @@
+{{ define "main" }}
+
+{{ $config := .Site.Data.config }}
+{{ $breadcrumb := $config.list_pages.breadcrumb }}
+{{ $recipe_page := $config.recipe_page }}
+
+{{ if eq .Section "recipes" }}
+{{ partial "recipe-jsonld.html" . }}
+{{ end }}
+
+<section class="container mx-auto px-4 relative" style="background-color: var(--color-bg); min-height: 100vh; padding-top: 96px;">
+  
+  <!-- 📍 Fil d'Ariane PLUS HAUT (position absolue) -->
+  <div class="absolute top-4 left-0 right-0">
+    <div class="container mx-auto px-4">
+      <nav class="text-sm text-gray-500" aria-label="Fil d'Ariane">
+        <ol class="flex flex-wrap items-center gap-1 text-[0.95rem] sm:text-base font-medium">
+          <li>
+            <a href="/" class="hover:underline font-semibold" style="color: var(--primary);">{{ $breadcrumb.home }}</a>
+            <span class="mx-1 text-gray-400">→</span>
+          </li>
+          <li>
+            <a href="/categories/" class="hover:underline font-semibold" style="color: var(--primary);">{{ $breadcrumb.categories }}</a>
+            <span class="mx-1 text-gray-400">→</span>
+          </li>
+          {{ with index .Params.categories 0 }}
+            {{ $cat := . }}
+            {{ $catTerm := site.Taxonomies.categories.Get $cat }}
+            {{ if $catTerm }}
+              <li>
+                <a href="{{ $catTerm.Page.RelPermalink }}" class="hover:underline font-semibold" style="color: var(--primary);">{{ $cat }}</a>
+                <span class="mx-1 text-gray-400">→</span>
+              </li>
+            {{ else }}
+              <!-- Fallback: utiliser la méthode directe -->
+              {{ $catSlug := $cat | urlize }}
+              <li>
+                <a href="{{ printf "/categories/%s/" $catSlug }}" class="hover:underline font-semibold" style="color: var(--primary);">{{ $cat }}</a>
+                <span class="mx-1 text-gray-400">→</span>
+              </li>
+            {{ end }}
+          {{ end }}
+          <li class="font-normal" style="color: var(--color-text);">{{ .Title }}</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+
+  <!-- 🍳 Titre recette distinctif EXACTEMENT à 96px du haut -->
+  <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-left mb-8" style="color: var(--color-text); font-family: var(--font-serif);">
+    {{ .Title }}
+  </h1>
+
+  <!-- 📱 Contenu recette avec layout grid -->
+  <div class="max-w-6xl mx-auto">
+    
+    <!-- En-tête recette : image + infos -->
+    <div class="grid md:grid-cols-[1fr_1.5fr] gap-6 sm:gap-10 items-start mb-12">
+      
+      <!-- Image -->
+      {{ with .Params.image }}
+        <div class="max-w-md mx-auto md:mx-0">
+          {{/* VERSION ASSETS/ : Hugo génère automatiquement WebP + responsive */}}
+          {{ $img := resources.Get (printf "images/%s" .) }}
+          {{ if $img }}
+            {{/* Tailles optimisées pour l'affichage réel */}}
+            {{ $small := $img.Fill "500x375 q90" }}
+            {{ $large := $img.Fill "800x600 q90" }}
+            {{ $webpSmall := $img.Fill "500x375 q85 webp" }}
+            {{ $webpLarge := $img.Fill "800x600 q85 webp" }}
+            
+            <picture>
+              {{/* WebP responsive */}}
+              <source srcset="{{ $webpSmall.RelPermalink }} 500w, {{ $webpLarge.RelPermalink }} 800w" 
+                      type="image/webp"
+                      sizes="(max-width: 768px) 500px, 800px">
+              {{/* JPG responsive */}}
+              <source srcset="{{ $small.RelPermalink }} 500w, {{ $large.RelPermalink }} 800w" 
+                      type="image/jpeg"
+                      sizes="(max-width: 768px) 500px, 800px">
+              {{/* Fallback */}}
+              <img src="{{ $small.RelPermalink }}" 
+                   alt="{{ $.Title }}" 
+                   class="rounded-2xl shadow-md w-full h-auto object-cover"
+                   loading="eager"
+                   width="500" 
+                   height="375">
+            </picture>
+          {{ else }}
+            {{/* Fallback si image non trouvée */}}
+            <div class="w-full h-80 bg-gray-200 rounded-2xl flex items-center justify-center">
+              <span class="text-gray-400">Image de recette non trouvée</span>
+            </div>
+          {{ end }}
+        </div>
+      {{ end }}
+      
+      <!-- Infos recette -->
+      <div class="flex flex-col gap-4 sm:gap-6">
+        
+        <!-- Auteur et date -->
+        {{ if or .Params.author .Date }}
+          <div class="space-y-1 text-sm text-center md:text-left">
+            {{ with .Params.author }}
+              <p class="font-semibold" style="color: var(--color-text);">
+                {{ $recipe_page.author_prefix }} {{ . }}
+              </p>
+            {{ end }}
+            {{ if .Date }}
+              <p class="italic" style="color: var(--color-text-secondary);">
+                <time datetime="{{ .Date.Format "2006-01-02" }}">
+                  {{ $recipe_page.published_prefix }} {{ .Date.Format "02 January 2006" }}
+                </time>
+              </p>
+            {{ end }}
+          </div>
+        {{ end }}
+
+        <!-- Description -->
+        {{ $intro := .Params.description | default .Summary }}
+        {{ with $intro }}
+          <div class="text-lg text-center md:text-left italic max-w-prose" style="color: var(--color-text-secondary);">
+            {{ . | markdownify }}
+          </div>
+        {{ end }}
+
+        <!-- Résumé recette -->
+        {{ partial "recipe-summary.html" . }}
+        
+        <!-- Boutons CTA MIGRÉS -->
+        {{ partial "cta-buttons.html" . }}
+      </div>
+    </div>
+
+    <!-- Corps recette : ingrédients + instructions -->
+    <div class="grid lg:grid-cols-[2fr_1fr] gap-6 sm:gap-8 lg:gap-12 items-start">
+      
+      <!-- Colonne principale -->
+      <div class="w-full space-y-8">
+        
+        <!-- SECTION INGRÉDIENTS MIGRÉE -->
+        <div class="card card--large" id="ingredients">
+          <h2 class="section__title">{{ $recipe_page.sections.ingredients }}</h2>
+          <ul class="recipe-list recipe-list--ingredients">
+            {{ range .Params.ingredients }}
+              <li class="recipe-list__item">{{ . }}</li>
+            {{ end }}
+          </ul>
+        </div>
+        
+        <!-- SECTION ÉTAPES MIGRÉE -->
+        <div class="card card--large" id="steps">
+          <h2 class="section__title">{{ $recipe_page.sections.instructions }}</h2>
+          <ol class="recipe-list recipe-list--steps">
+            {{ range .Params.instructions }}
+              <li class="recipe-list__item">{{ . }}</li>
+            {{ end }}
+          </ol>
+        </div>
+        
+        <!-- SECTION TIPS MIGRÉE -->
+        {{ with .Params.tips }}
+          <div class="card card--large" id="tips">
+            <h2 class="section__title">{{ $recipe_page.sections.tips }}</h2>
+            <ul class="recipe-list">
+              {{ range . }}
+                <li class="recipe-list__item">💡 {{ . }}</li>
+              {{ end }}
+            </ul>
+          </div>
+        {{ end }}
+        
+        <!-- SECTION FAQ MIGRÉE -->
+        {{ with .Params.faq }}
+          <div class="card card--large" id="faq">
+            <h2 class="section__title">{{ $recipe_page.sections.faq }}</h2>
+            <div id="faq-content" class="space-y-4">
+              {{ range . }}
+                <details class="p-4 bg-white/70 rounded-xl">
+                  <summary class="font-medium cursor-pointer">{{ .q }}</summary>
+                  <p class="mt-2">{{ .a }}</p>
+                </details>
+              {{ end }}
+            </div>
+          </div>
+        {{ end }}
+        
+        <!-- Articles liés -->
+        {{ partial "related.html" . }}
+        
+        <!-- Commentaires -->
+        {{ partial "comments.html" . }}
+      </div>
+
+      <!-- Colonne latérale -->
+      <aside class="space-y-6 w-full">
+        
+        <!-- Note de la cheffe MIGRÉE -->
+        {{ with .Params.note }}
+          <div class="card" style="background-color: var(--color-bg-alt); border-left: 4px solid var(--primary);">
+            <h3 class="text-base sm:text-lg font-semibold mb-2" style="color: var(--color-text); font-family: var(--font-serif);">
+              <span aria-hidden="true">📝</span> {{ $recipe_page.chef_note_title }}
+            </h3>
+            <p class="text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+              {{ . | markdownify }}
+            </p>
+          </div>
+        {{ end }}
+
+        <!-- À propos MIGRÉ -->
+        <div class="card">
+          <h3 class="text-base sm:text-lg font-semibold mb-2" style="color: var(--color-text); font-family: var(--font-serif);">
+            {{ $recipe_page.about_sidebar_title }}
+          </h3>
+          <p class="text-sm leading-relaxed" style="color: var(--color-text-secondary);">
+            <span aria-hidden="true">👩‍🔬</span> {{ $recipe_page.about_sidebar_text }}
+          </p>
+        </div>
+      </aside>
+      
+    </div>
+  </div>
+
+</section>
+
+<!-- Navigation sticky conservée -->
+{{ partial "recipe-sticky-nav.html" . }}
+{{ end }}

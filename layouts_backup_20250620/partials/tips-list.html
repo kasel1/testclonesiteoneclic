@@ -1,0 +1,6 @@
+<!-- ===== layouts/partials/tips-list.html ===== -->
+<ul id="tips-list" class="list-disc list-inside space-y-1">
+  {{ range .Params.tips }}
+    <li>💡 {{ . }}</li>
+  {{ end }}
+</ul>

@@ -1,0 +1,118 @@
+{{/* Section "Qui suis-je" - Version Sophistiquée CENTRALISÉE */}}
+
+{{ $config := .Site.Data.config }}
+{{ $about_section := $config.about_section }}
+
+<section class="relative overflow-hidden py-32 bg-gradient-to-br from-slate-50 via-white to-slate-100">
+  <!-- Effet de fond subtil -->
+  <div class="absolute inset-0 bg-gradient-to-r from-transparent via-amber-500/10 to-transparent"></div>
+  
+  <!-- Particules minimalistes -->
+  <div class="absolute inset-0 overflow-hidden pointer-events-none">
+    <div class="absolute top-32 left-32 w-1 h-1 bg-amber-400/30 rounded-full animate-pulse"></div>
+    <div class="absolute bottom-40 right-40 w-1 h-1 bg-amber-400/20 rounded-full animate-pulse animation-delay-1000"></div>
+  </div>
+
+  <div class="relative container mx-auto px-6 max-w-7xl">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+      
+      <!-- Contenu textuel -->
+      <div class="order-2 lg:order-1 space-y-10">
+        <!-- Badge minimaliste -->
+        <div class="inline-flex items-center px-6 py-2 border border-amber-500/30 rounded-full text-amber-700 text-sm font-medium tracking-wider uppercase bg-amber-50/50">
+          {{ $about_section.badge_text }}
+        </div>
+
+        <!-- Titre épuré -->
+        <h2 class="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight text-slate-900">
+          {{ $about_section.title }}
+          <span class="text-amber-600">{{ $about_section.title_accent }}</span>
+        </h2>
+
+        <!-- Texte principal -->
+        <div class="space-y-8 text-lg text-slate-700 leading-relaxed">
+          <p class="text-2xl text-slate-900 font-light">
+            {{ $about_section.chef_intro }}
+          </p>
+          
+          <p class="text-xl">
+            {{ $about_section.chef_description }}
+          </p>
+        </div>
+
+        <!-- Liste sophistiquée -->
+        <div class="space-y-6">
+          <div class="flex items-start space-x-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-sm">
+            <div class="flex-shrink-0 w-2 h-2 bg-amber-600 rounded-full mt-3"></div>
+            <div>
+              <h3 class="text-xl font-semibold text-slate-900 mb-2">{{ $about_section.philosophy_title }}</h3>
+              <p class="text-slate-600">{{ $about_section.philosophy_text }}</p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-sm">
+            <div class="flex-shrink-0 w-2 h-2 bg-amber-600 rounded-full mt-3"></div>
+            <div>
+              <h3 class="text-xl font-semibold text-slate-900 mb-2">{{ $about_section.sustainable_title }}</h3>
+              <p class="text-slate-600">{{ $about_section.sustainable_text }}</p>
+            </div>
+          </div>
+
+          <div class="flex items-start space-x-6 p-6 bg-white/80 backdrop-blur-sm rounded-2xl border border-slate-200/50 shadow-sm">
+            <div class="flex-shrink-0 w-2 h-2 bg-amber-600 rounded-full mt-3"></div>
+            <div>
+              <h3 class="text-xl font-semibold text-slate-900 mb-2">{{ $about_section.transmission_title }}</h3>
+              <p class="text-slate-600">{{ $about_section.transmission_text }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bouton CTA sophistiqué -->
+        <div class="pt-6">
+          <a href="{{ $about_section.cta_url }}" 
+             class="group relative inline-flex items-center justify-center px-10 py-4 text-lg font-medium text-slate-900 bg-gradient-to-r from-amber-400 to-amber-500 rounded-full shadow-2xl hover:shadow-amber-500/25 hover:scale-105 transform transition-all duration-300 overflow-hidden">
+            <span class="relative z-10 flex items-center tracking-wide">
+              {{ $about_section.cta_text }}
+              <svg class="w-5 h-5 ml-3 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+              </svg>
+            </span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Image sophistiquée -->
+      <div class="order-1 lg:order-2 flex justify-center lg:justify-end">
+        <div class="relative group">
+          <!-- Cadre élégant -->
+          <div class="absolute -inset-4 bg-gradient-to-br from-amber-400/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          
+          <!-- Container de l'image -->
+          <div class="relative w-96 h-96 rounded-full overflow-hidden shadow-2xl ring-1 ring-slate-200 group-hover:ring-amber-400/50 transition-all duration-500">
+            {{ $img := resources.Get "images/chef.jpg" }}
+            {{ if $img }}
+              <img src="{{ $img.RelPermalink }}" 
+                   alt="{{ $about_section.image_alt }}" 
+                   loading="lazy" 
+                   class="w-full h-full object-cover grayscale-0 group-hover:scale-105 transition-all duration-700 ease-out">
+            {{ else }}
+              <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
+                <div class="text-center">
+                  <div class="w-24 h-24 mx-auto mb-4 bg-amber-100 rounded-full flex items-center justify-center">
+                    <svg class="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                  </div>
+                  <p class="text-slate-500 text-sm uppercase tracking-wider">Chef Portrait</p>
+                </div>
+              </div>
+            {{ end }}
+          </div>
+
+          <!-- Accent minimaliste -->
+          <div class="absolute -bottom-6 -right-6 w-4 h-4 bg-amber-500 rounded-full opacity-80 group-hover:opacity-100 transition-opacity duration-300"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

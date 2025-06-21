@@ -1,0 +1,46 @@
+{{- /* layouts/partials/recipe-jsonld.html */ -}}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Recipe",
+  "name": "{{ .Title }}",
+  "image": [ "{{ .Params.image }}" ],
+  "author": {
+    "@type": "Person",
+    "name": "{{ with .Params.author }}{{ . }}{{ else }}{{ .Site.Params.author }}{{ end }}"
+  },
+  "datePublished": "{{ .Date.Format "2006-01-02" }}",
+  "description": "{{ with .Params.description }}{{ . }}{{ else }}{{ .Summary }}{{ end }}",
+  "prepTime": "{{ .Params.prepTime }}",
+  "cookTime": "{{ .Params.cookTime }}",
+  "totalTime": {{ with .Params.totalTime }}{{ printf "\"PT%vM\"" . }}{{ else }}""{{ end }},
+  "recipeYield": "{{ with .Params.recipeYield }}{{ . }}{{ else }}{{ "" }}{{ end }}",
+  "recipeCategory": "{{ with .Params.categories }}{{ index . 0 }}{{ else }}{{ "" }}{{ end }}",
+  "recipeCuisine": "{{ with .Params.cuisine }}{{ . }}{{ else }}{{ "" }}{{ end }}",
+  "keywords": {{ .Params.keywords }},
+  "recipeIngredient": [
+    {{- range $i, $item := .Params.ingredients -}}
+      {{- if $i }},{{ end }}"{{ $item }}"
+    {{- end -}}
+  ],
+  "recipeInstructions": [
+    {{- $steps := .Params.instructions -}}
+    {{- range $i, $step := $steps -}}
+      {{- if $i }},{{ end }}
+      { "@type": "HowToStep", "text": "{{ $step }}" }
+    {{- end -}}
+  ]
+  {{ with .Params.nutrition }},
+  "nutrition": {
+    "@type": "NutritionInformation"
+    {{- with .calories }}, "calories": "{{ . }}"{{ end }}
+    {{- with .fatContent }}, "fatContent": "{{ . }}"{{ end }}
+    {{- with .carbohydrateContent }}, "carbohydrateContent": "{{ . }}"{{ end }}
+    {{- with .proteinContent }}, "proteinContent": "{{ . }}"{{ end }}
+  }
+  {{ end }}
+  {{ with .Params.tag }},
+  "keywords": "{{ delimit . ", " }}"
+  {{ end }}
+}
+</script>

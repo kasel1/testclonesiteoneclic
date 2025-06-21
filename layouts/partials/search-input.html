@@ -1,0 +1,56 @@
+<!-- layouts/partials/search-input.html - VERSION MIGRÉE VERS NOUVEAU CSS -->
+
+<div class="search">
+  <!-- Libellé masqué pour l’accessibilité -->
+  <label for="search-{{ .TargetID }}" class="sr-only">
+    {{ .Placeholder }}
+  </label>
+
+  <!-- Icône de recherche -->
+  <svg
+    class="search__icon"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+    aria-hidden="true">
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      stroke-width="2"
+      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+  </svg>
+
+  <!-- Champ de recherche -->
+  <input
+    id="search-{{ .TargetID }}"
+    name="search-{{ .TargetID }}"
+    data-target-id="{{ .TargetID }}"
+    type="search"
+    role="searchbox"
+    enterkeyhint="search"
+    placeholder="{{ .Placeholder }}"
+    aria-autocomplete="list"
+    aria-expanded="false"
+    aria-controls="search-results-{{ .TargetID }}"
+    aria-haspopup="listbox"
+    aria-label="{{ .Placeholder }}"
+    class="search__input {{ .Class }}" />
+
+  <!-- Bouton de suppression (clear) -->
+  <button
+    id="search-clear-{{ .TargetID }}"
+    type="button"
+    class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 hidden"
+    aria-label="Effacer la recherche">
+    ×
+  </button>
+
+  <!-- Zone d’affichage des résultats -->
+  <ul
+    id="search-results-{{ .TargetID }}"
+    role="listbox"
+    aria-label="Suggestions de recherche"
+    class="search__results hidden"
+    style="z-index: var(--z-dropdown);">
+  </ul>
+</div>

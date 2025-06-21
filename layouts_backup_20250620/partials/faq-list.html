@@ -1,0 +1,9 @@
+<!-- ===== layouts/partials/faq-list.html ===== -->
+<div id="faq-content" class="space-y-4">
+  {{ range .Params.faq }}
+    <details class="p-4 bg-white/70 rounded-[var(--radius-card)]">
+      <summary class="font-medium cursor-pointer">{{ .q }}</summary>
+      <p class="mt-2">{{ .a }}</p>
+    </details>
+  {{ end }}
+</div>

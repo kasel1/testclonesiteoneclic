@@ -1,0 +1,154 @@
+{{ define "main" }}
+
+{{ $config := .Site.Data.config }}
+{{ $homepage := $config.homepage }}
+{{ $list_pages := $config.list_pages }}
+{{ $breadcrumb := $config.list_pages.breadcrumb }}
+
+<section class="container mx-auto px-4 py-24 min-h-screen" style="background-color: var(--color-bg);">
+
+  {{ if .IsHome }}
+    <!-- 🏠 PAGE ACCUEIL -->
+    <!-- Hero animé -->
+    {{ partial "hero.html" . }}
+
+    <!-- Titre section recettes - Style Template 2 -->
+    <h2 class="text-3xl font-bold mb-8 text-center" style="color: var(--primary); font-family: var(--font-serif);">
+      {{ $homepage.latest_recipes.title }}
+    </h2>
+    
+    <!-- Grille recettes (6 dernières) - Style Template 2 -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      {{ range first 6 (where .Site.RegularPages "Section" "recipes") }}
+        <a href="{{ .RelPermalink }}" class="block bg-white shadow-md rounded-xl overflow-hidden transform transition hover:-translate-y-1 hover:shadow-xl">
+          {{ with .Params.image }}
+            {{/* Optimisation Hugo pipes conservée */}}
+            {{ $img := resources.Get (printf "images/%s" .) }}
+            {{ if $img }}
+              {{ $optimized := $img.Fill "400x240 q85" }}
+              <img src="{{ $optimized.RelPermalink }}" 
+                   alt="{{ $.Title }}" 
+                   class="w-full h-48 object-cover"
+                   loading="lazy">
+            {{ else }}
+              {{/* Fallback si image dans static/ */}}
+              <img src="/{{ . }}" 
+                   alt="{{ $.Title }}" 
+                   class="w-full h-48 object-cover"
+                   loading="lazy">
+            {{ end }}
+          {{ end }}
+          
+          <div class="p-4">
+            <h3 class="text-lg font-semibold mb-2" style="color: var(--color-text); font-family: var(--font-serif);">
+              {{ .Title }}
+            </h3>
+            {{ with .Params.description }}
+              <p class="text-sm line-clamp-3" style="color: var(--color-text-secondary);">
+                {{ . }}
+              </p>
+            {{ end }}
+            <span class="text-xs mt-2 block" style="color: var(--color-text-secondary);">
+              {{ .Date.Format "02 Jan 2006" }}
+            </span>
+          </div>
+        </a>
+      {{ end }}
+    </div>
+
+  {{ else if or (eq .Section "recipes") (in (slice "taxonomyTerm" "taxonomy") .Kind) }}
+    <!-- 📚 PAGES RECETTES / CATÉGORIES -->
+    
+    <!-- Fil d'Ariane pour catégories -->
+    {{ if in (slice "taxonomyTerm" "taxonomy") .Kind }}
+      <div class="pb-2 sm:pb-4 border-b border-gray-100 mb-6 sm:mb-8">
+        <nav class="text-sm text-gray-500" aria-label="Fil d'Ariane">
+          <ol class="flex flex-wrap items-center gap-1 text-[0.95rem] sm:text-base font-medium">
+            <li>
+              <a href="/" class="hover:underline font-semibold" style="color: var(--primary);">{{ $breadcrumb.home }}</a>
+              <span class="mx-1 text-gray-400">→</span>
+            </li>
+            <li>
+              <a href="/categories/" class="hover:underline font-semibold" style="color: var(--primary);">{{ $breadcrumb.categories }}</a>
+              <span class="mx-1 text-gray-400">→</span>
+            </li>
+            <li class="font-normal" style="color: var(--color-text);">{{ .Title }}</li>
+          </ol>
+        </nav>
+      </div>
+    {{ end }}
+
+    <!-- Titre principal - Style Template 2 -->
+    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-center mb-4" style="color: var(--primary); font-family: var(--font-serif);">
+      {{ if eq .Section "recipes" }}
+        {{ $list_pages.recipes_title }}
+      {{ else }}
+        {{ $list_pages.categories_title_prefix }} {{ .Title }}
+      {{ end }}
+    </h1>
+    
+    <!-- Description pour section recettes -->
+    {{ if eq .Section "recipes" }}
+      <p class="text-base text-center mb-8 max-w-2xl mx-auto" style="color: var(--color-text-secondary);">
+        {{ $list_pages.recipes_description }}
+      </p>
+    {{ end }}
+
+    <!-- Grille recettes avec pagination - Style Template 2 -->
+    {{ $pages := .Pages }}
+    {{ $p := .Paginate $pages }}
+    
+    {{ if gt (len $p.Pages) 0 }}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {{ range $p.Pages }}
+          <a href="{{ .RelPermalink }}" class="block bg-white shadow-md rounded-xl overflow-hidden transform transition hover:-translate-y-1 hover:shadow-xl">
+            {{ with .Params.image }}
+              {{/* Optimisation Hugo pipes conservée */}}
+              {{ $img := resources.Get (printf "images/%s" .) }}
+              {{ if $img }}
+                {{ $optimized := $img.Fill "400x240 q85" }}
+                <img src="{{ $optimized.RelPermalink }}" 
+                     alt="{{ $.Title }}" 
+                     class="w-full h-48 object-cover"
+                     loading="lazy">
+              {{ else }}
+                {{/* Fallback si image dans static/ */}}
+                <img src="/{{ . }}" 
+                     alt="{{ $.Title }}" 
+                     class="w-full h-48 object-cover"
+                     loading="lazy">
+              {{ end }}
+            {{ end }}
+            
+            <div class="p-4">
+              <h2 class="text-lg font-semibold mb-2" style="color: var(--color-text); font-family: var(--font-serif);">
+                {{ .Title }}
+              </h2>
+              {{ with .Params.description }}
+                <p class="text-sm line-clamp-3" style="color: var(--color-text-secondary);">
+                  {{ . }}
+                </p>
+              {{ end }}
+              <span class="text-xs mt-2 block" style="color: var(--color-text-secondary);">
+                {{ .Date.Format "02 Jan 2006" }}
+              </span>
+            </div>
+          </a>
+        {{ end }}
+      </div>
+      
+      <!-- Pagination -->
+      {{ partial "pagination.html" $p }}
+    {{ else }}
+      <p class="text-center mt-12" style="color: var(--color-text-secondary);">
+        {{ $list_pages.no_recipes }}
+      </p>
+    {{ end }}
+
+  {{ else }}
+    <!-- 📄 AUTRES PAGES -->
+    {{ .Content }}
+  {{ end }}
+
+</section>
+{{ end }}

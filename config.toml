@@ -1,0 +1,176 @@
+baseURL      = "https://recettes-blog-test.pages.dev/"
+languageCode = "fr"
+title        = "Recettes Blog"
+
+############################################################################### 
+#  Pagination, taxonomies, permaliens
+###############################################################################
+[pagination]
+  pagerSize = 12
+
+[taxonomies]
+  category = "categories"
+  tag      = "tags"
+
+[permalinks]
+  recipes = "/recipes/:slug/"
+
+###############################################################################
+#  Build – Pipeline Tailwind CLI natif (pas PostCSS)
+###############################################################################
+[build]
+  writeStats = true
+
+  [build.buildStats]
+    enable = true
+
+  [[build.cachebusters]]
+    source = "assets/notwatching/hugo_stats\\.json"
+    target = "css"
+
+  [[build.cachebusters]]
+    source = "(postcss|tailwind)\\.config\\.js"
+    target = "css"
+
+[module]
+  [[module.mounts]]
+    source = "assets"
+    target = "assets"
+
+  [[module.mounts]]
+    disableWatch = true
+    source = "hugo_stats.json"
+    target = "assets/notwatching/hugo_stats.json"
+
+[outputs]
+  home = ["HTML", "JSON"]
+
+[minify]
+  # autres options…
+  [minify.tdewolff.html]
+    keepQuotes = true   # ← conserve toujours les guillemets
+
+###############################################################################
+#  Pages liées (recommandations)
+###############################################################################
+[related]
+  includeNewer = true
+  threshold    = 80
+
+[[related.indices]]
+  name   = "tags"
+  weight = 100
+
+[[related.indices]]
+  name   = "categories"
+  weight = 80
+
+###############################################################################
+#  Paramètres personnalisables
+###############################################################################
+[params]
+  description   = "Recettes maison faciles et gourmandes"
+  defaultImage  = "/img/cover-default.jpg"
+  twitterHandle = "@TonCompteX"
+
+[params.analytics]
+  plausibleDomain = "recettes-blog-test.pages.dev"
+
+[params.ui]
+  primary     = "#0f52ba"
+  radius_card = "0.75rem"
+  summary_bg  = "hsl(210 20% 98%)"
+
+  showSave    = true
+  showPin     = true
+  showPrint   = true
+
+[params.ui.labels]
+  tips = "Tips & Variations"
+  faq  = "FAQ"
+
+###############################################################################
+#  Menus principaux
+###############################################################################
+[[menu.main]]
+  name   = "Accueil"
+  url    = "/"
+  weight = 1
+
+[[menu.main]]
+  identifier = "recettes"
+  name       = "Recettes"
+  url        = "/recipes/"
+  weight     = 2
+
+[[menu.main]]
+  name   = "Catégories"
+  url    = "/categories/"
+  weight = 3
+
+[[menu.main]]
+  name   = "À propos"
+  url    = "/about/"
+  weight = 4
+
+[[menu.main]]
+  name   = "Contact"
+  url    = "/contact/"
+  weight = 5
+
+###############################################################################
+#  Sous-menu Recettes
+###############################################################################
+[[menu.recipes]]
+  identifier = "entrees"
+  name       = "Entrées"
+  url        = "/recipes/entrees/"
+  weight     = 1
+
+[[menu.recipes]]
+  identifier = "salades"
+  name       = "Salades"
+  url        = "/recipes/salades/"
+  weight     = 2
+
+[[menu.recipes]]
+  identifier = "plats-principaux"
+  name       = "Plats principaux"
+  url        = "/recipes/plats-principaux/"
+  weight     = 3
+
+[[menu.recipes]]
+  identifier = "accompagnements"
+  name       = "Accompagnements"
+  url        = "/recipes/accompagnements/"
+  weight     = 4
+
+[[menu.recipes]]
+  identifier = "desserts"
+  name       = "Desserts"
+  url        = "/recipes/desserts/"
+  weight     = 5
+
+[[menu.recipes]]
+  identifier = "boissons"
+  name       = "Boissons"
+  url        = "/recipes/boissons/"
+  weight     = 6
+
+[[menu.recipes]]
+  identifier = "snacks"
+  name       = "Snacks & Apéros"
+  url        = "/recipes/snacks/"
+  weight     = 7
+
+[[menu.recipes]]
+  identifier = "sauces"
+  name       = "Sauces & Dips"
+  url        = "/recipes/sauces/"
+  weight     = 8
+
+[[menu.recipes]]
+  identifier = "vegetalien"
+  name       = "Végan & Végétarien"
+  url        = "/recipes/vegetalien/"
+  weight     = 9
